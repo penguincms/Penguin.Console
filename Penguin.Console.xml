@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Penguin.Console</name>
+    </assembly>
+    <members>
+        <member name="T:Penguin.Console.Process">
+            <summary>
+            Static class for managing console stuff
+            </summary>
+        </member>
+        <member name="M:Penguin.Console.Process.Run(System.String,System.String[])">
+            <summary>
+            Runs an exe at the given path with the given args and returns the FINAL result to a string
+            </summary>
+            <param name="path">The path of the application to run</param>
+            <param name="args">The application arguments</param>
+            <returns>The full STD out as a string</returns>
+        </member>
+    </members>
+</doc>
