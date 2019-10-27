@@ -21,6 +21,12 @@
         public string Output { get; set; }
 
         /// <summary>
+        /// If true, the output and error streams were definitely fully read. If false, they may still have been but theres no
+        /// guarantee because the closing characters were not found during the timeout period.
+        /// </summary>
+        public bool StreamRead { get; set; }
+
+        /// <summary>
         /// The output stream if exit code 0, otherwise the error stream
         /// </summary>
         /// <returns></returns>

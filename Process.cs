@@ -8,54 +8,89 @@ namespace Penguin.Console
     /// <summary>
     /// Static class for managing console stuff
     /// </summary>
-    public static class Process
+    public static class ProcessHelper
     {
         /// <summary>
         /// Starts a process with the given startinfo
         /// </summary>
         /// <param name="startInfo">the startinfo of the process</param>
         /// <returns>the result of the run</returns>
-        public static ProcessResult Run(System.Diagnostics.ProcessStartInfo startInfo, int timeout = int.MaxValue)
+        public static ProcessResult Run(ProcessStartInfo startInfo, int timeout = int.MaxValue)
         {
             StringBuilder output = new StringBuilder();
             StringBuilder error = new StringBuilder();
             ProcessResult Result = new ProcessResult();
 
-            using (System.Diagnostics.Process process = new System.Diagnostics.Process())
+            using (Process process = new Process())
             {
                 process.StartInfo = startInfo;
+
+                TaskCompletionSource<bool> StreamDone = new TaskCompletionSource<bool>();
+
                 bool outputDone = false;
                 bool errorDone = false;
-                process.OutputDataReceived += (sender, e) => { if (e.Data is null) { outputDone = true; } else { output.Append(e.Data); } output.Append(System.Environment.NewLine); };
-                process.ErrorDataReceived += (sender, e) => { if (e.Data is null) { errorDone = true; } else { error.Append(e.Data); } error.Append(System.Environment.NewLine); };
-                process.Start();
-                process.BeginOutputReadLine();
-                process.BeginErrorReadLine();
+
+                void HandleData(StringBuilder sb, DataReceivedEventArgs e, ref bool done)
+                {
+                    if (e.Data is null)
+                    {
+                        done = true;
+
+                        if (errorDone && outputDone)
+                        {
+                            StreamDone.SetResult(true);
+                        }
+                    }
+                    else
+                    {
+                        sb.Append(e.Data);
+                    }
+
+                    sb.Append(System.Environment.NewLine);
+                }
+
+                process.OutputDataReceived += (sender, e) => HandleData(output, e, ref outputDone);
+
+                process.ErrorDataReceived += (sender, e) => HandleData(error, e, ref errorDone);
 
                 //Task<string> stdOutTask = process.StandardOutput.ReadToEndAsync();
                 //Task<string> stdErrTask = process.StandardError.ReadToEndAsync();
 
-                bool ProcessDone()
+                Task WaitShort = new Task(() =>
                 {
-                    return process.HasExited || process.WaitForExit(5000);
-                }
-
-                bool StreamDone()
-                {
-                    return errorDone && outputDone;
-                }
-
-                while (!ProcessDone() || !StreamDone())
-                {
-                    if (ProcessDone())
+                    while (!process.WaitForExit(5000) && !process.HasExited)
                     {
-                        //If the process is done and we havent gotten new stream information a whole second
-                        //later, we probably arent ever getting it
-                        System.Threading.Thread.Sleep(1000);
-
-                        break;
                     }
-                }
+                });
+
+                Task WaitLong = new Task(() =>
+                {
+                    process.WaitForExit();
+                });
+
+                
+
+                Task TryFinish = new Task(() =>
+                {
+                    WaitLong.Start();
+                    Task Timeout = Task.Delay(15000);
+
+                    Task.WaitAny(WaitLong, Timeout);
+                });
+
+                WaitShort.ContinueWith((a) =>
+                {
+                    TryFinish.Start();
+                });
+
+                process.Start();
+
+                WaitShort.Start();
+
+                process.BeginOutputReadLine();
+                process.BeginErrorReadLine();
+
+                Task.WaitAny(TryFinish, StreamDone.Task);
 
                 Result.ExitCode = process.ExitCode;
 
