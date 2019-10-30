@@ -4,6 +4,8 @@
     <PackageProjectUrl>https://github.com/penguincms/Penguin.Console</PackageProjectUrl>
     <Version>1.3.0</Version>
     <Description>Small static class for launching a console application and redirecting the result</Description>
+    <AssemblyName>Penguin.Console</AssemblyName>
+    <RootNamespace>Penguin.Console</RootNamespace>
   </PropertyGroup>
   <Import Project="Penguin.Projects.Shared\Penguin.Projects.Shared.csproj" />
 </Project>
