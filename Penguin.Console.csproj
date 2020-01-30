@@ -6,6 +6,7 @@
     <Description>Small static class for launching a console application and redirecting the result</Description>
     <AssemblyName>Penguin.Console</AssemblyName>
     <RootNamespace>Penguin.Console</RootNamespace>
+    <DocumentationFile>Penguin.Console.xml</DocumentationFile>
   </PropertyGroup>
   <Import Project="Penguin.Projects.Shared\Penguin.Projects.Shared.csproj" />
 </Project>
