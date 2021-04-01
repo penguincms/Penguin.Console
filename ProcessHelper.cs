@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace Penguin.Console
@@ -16,7 +15,7 @@ namespace Penguin.Console
         /// </summary>
         /// <param name="startInfo">the startinfo of the process</param>
         /// <returns>the result of the run</returns>
-        public static ProcessResult Run(ProcessStartInfo startInfo, int timeout = int.MaxValue, Action<string> Std = null)
+        public static ProcessResult Run(ProcessStartInfo startInfo, int timeout = int.MaxValue, Action<string> std = null)
         {
             StringBuilder output = new StringBuilder();
             StringBuilder error = new StringBuilder();
@@ -37,14 +36,14 @@ namespace Penguin.Console
                     {
                         done = true;
 
-                        if (errorDone && outputDone)
+                        if (errorDone && outputDone && !StreamDone.Task.IsCompleted)
                         {
                             StreamDone.SetResult(true);
                         }
                     }
                     else
                     {
-                        Std.Invoke(e.Data + System.Environment.NewLine);
+                        std?.Invoke(e.Data + System.Environment.NewLine);
                         sb.Append(e.Data);
                     }
 
@@ -67,10 +66,7 @@ namespace Penguin.Console
                     }
                 });
 
-                Task WaitLong = new Task(() =>
-                {
-                    process.WaitForExit();
-                });
+                Task WaitLong = new Task(() => process.WaitForExit());
 
                 
 
@@ -82,10 +78,7 @@ namespace Penguin.Console
                     Task.WaitAny(WaitLong, Timeout);
                 });
 
-                WaitShort.ContinueWith((a) =>
-                {
-                    TryFinish.Start();
-                });
+                WaitShort.ContinueWith((a) => TryFinish.Start());
 
                 process.Start();
 
@@ -112,15 +105,9 @@ namespace Penguin.Console
         /// <param name="path">The path of the application to run</param>
         /// <param name="args">The application arguments</param>
         /// <returns>The full STD out as a string</returns>
-        public static ProcessResult Run(string path, params string[] args)
-        {
-            return Run(GetStandardStartInfo(path, args));
-        }
+        public static ProcessResult Run(string path, params string[] args) => Run(GetStandardStartInfo(path, args));
 
-        public static ProcessResult Run(string path, Action<string> Std, params string[] args)
-        {
-            return Run(GetStandardStartInfo(path, args), int.MaxValue, Std);
-        }
+        public static ProcessResult Run(string path, Action<string> Std, params string[] args) => Run(GetStandardStartInfo(path, args), int.MaxValue, Std);
 
         /// <summary>
         /// Runs an exe at the given path with the given args and returns the FINAL result to a string
@@ -156,16 +143,18 @@ namespace Penguin.Console
 
         internal static System.Diagnostics.ProcessStartInfo GetStandardStartInfo(string path, params string[] args)
         {
-            System.Diagnostics.ProcessStartInfo startInfo = new System.Diagnostics.ProcessStartInfo();
-            startInfo.RedirectStandardInput = true;
-            startInfo.RedirectStandardOutput = true;
-            startInfo.RedirectStandardError = true;
+            System.Diagnostics.ProcessStartInfo startInfo = new System.Diagnostics.ProcessStartInfo
+            {
+                RedirectStandardInput = true,
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
 
-            startInfo.CreateNoWindow = true;
-            startInfo.UseShellExecute = false;
-            startInfo.WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden;
-            startInfo.FileName = path;
-            startInfo.Arguments = string.Join(" ", args);
+                CreateNoWindow = true,
+                UseShellExecute = false,
+                WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden,
+                FileName = path,
+                Arguments = string.Join(" ", args)
+            };
             return startInfo;
         }
     }
