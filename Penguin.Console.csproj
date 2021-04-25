@@ -2,7 +2,7 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <PackageProjectUrl>https://github.com/penguincms/Penguin.Console</PackageProjectUrl>
-    <Version>5.0.1</Version>
+    <Version>5.0.5</Version>
     <Description>Small static class for launching a console application and redirecting the result</Description>
     <AssemblyName>Penguin.Console</AssemblyName>
     <RootNamespace>Penguin.Console</RootNamespace>
