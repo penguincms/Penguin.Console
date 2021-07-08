@@ -4,20 +4,30 @@
         <name>Penguin.Console</name>
     </assembly>
     <members>
-        <member name="T:Penguin.Console.ProcessHelper">
+        <member name="T:Penguin.PgConsole.ProcessHelper">
             <summary>
             Static class for managing console stuff
             </summary>
         </member>
-        <member name="M:Penguin.Console.ProcessHelper.Run(System.Diagnostics.ProcessStartInfo,System.Int32,System.Action{System.String})">
+        <member name="M:Penguin.PgConsole.ProcessHelper.Run(System.Diagnostics.ProcessStartInfo,System.Int32,System.Action{System.String})">
             <summary>
             Starts a process with the given startinfo
             </summary>
             <param name="startInfo">the startinfo of the process</param>
+            <param name="timeout"></param>
+            <param name="std"></param>
             <returns>the result of the run</returns>
         </member>
-        <!-- Badly formed XML comment ignored for member "M:Penguin.Console.ProcessHelper.Run(System.String,System.String[])" -->
-        <member name="M:Penguin.Console.ProcessHelper.RunIn(System.String,System.String,System.Action{System.String},System.String[])">
+        <member name="M:Penguin.PgConsole.ProcessHelper.Run(System.String,System.String[])">
+            <summary>
+            Runs an exe at the given path with the given args and returns the FINAL result to a string
+            </summary>
+            <param name="path">The path of the application to run</param>
+            <param name="args">The application arguments</param>
+            <returns></returns>
+        </member>
+        <!-- Badly formed XML comment ignored for member "M:Penguin.PgConsole.ProcessHelper.Run(System.String,System.Action{System.String},System.String[])" -->
+        <member name="M:Penguin.PgConsole.ProcessHelper.RunIn(System.String,System.String,System.Action{System.String},System.String[])">
             <summary>
             Runs an exe at the given path with the given args and returns the FINAL result to a string
             </summary>
@@ -26,7 +36,7 @@
             <param name="args">The application arguments</param>
             <returns>The full STD out as a string</returns>
         </member>
-        <member name="M:Penguin.Console.ProcessHelper.RunIn(System.String,System.String,System.String[])">
+        <member name="M:Penguin.PgConsole.ProcessHelper.RunIn(System.String,System.String,System.String[])">
             <summary>
             Runs an exe at the given path with the given args and returns the FINAL result to a string
             </summary>
@@ -35,33 +45,33 @@
             <param name="args">The application arguments</param>
             <returns>The full STD out as a string</returns>
         </member>
-        <member name="T:Penguin.Console.ProcessResult">
+        <member name="T:Penguin.PgConsole.ProcessResult">
             <summary>
             The result of a run process
             </summary>
         </member>
-        <member name="P:Penguin.Console.ProcessResult.Error">
+        <member name="P:Penguin.PgConsole.ProcessResult.Error">
             <summary>
             Results from the standard error stream
             </summary>
         </member>
-        <member name="P:Penguin.Console.ProcessResult.ExitCode">
+        <member name="P:Penguin.PgConsole.ProcessResult.ExitCode">
             <summary>
             The process exit code
             </summary>
         </member>
-        <member name="P:Penguin.Console.ProcessResult.Output">
+        <member name="P:Penguin.PgConsole.ProcessResult.Output">
             <summary>
             Results from the standard output stream
             </summary>
         </member>
-        <member name="P:Penguin.Console.ProcessResult.StreamRead">
+        <member name="P:Penguin.PgConsole.ProcessResult.StreamRead">
             <summary>
             If true, the output and error streams were definitely fully read. If false, they may still have been but theres no
             guarantee because the closing characters were not found during the timeout period.
             </summary>
         </member>
-        <member name="M:Penguin.Console.ProcessResult.ToString">
+        <member name="M:Penguin.PgConsole.ProcessResult.ToString">
             <summary>
             The output stream if exit code 0, otherwise the error stream
             </summary>

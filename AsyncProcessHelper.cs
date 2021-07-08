@@ -2,7 +2,7 @@
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Penguin.Console
+namespace Penguin.PgConsole
 {
     // based on https://gist.github.com/AlexMAS/276eed492bc989e13dcce7c78b9e179d
     internal static class ProcessAsyncHelper

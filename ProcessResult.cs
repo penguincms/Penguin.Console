@@ -1,4 +1,4 @@
-﻿namespace Penguin.Console
+﻿namespace Penguin.PgConsole
 {
     /// <summary>
     /// The result of a run process

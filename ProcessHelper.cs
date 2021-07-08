@@ -3,7 +3,7 @@ using System.Diagnostics;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Penguin.Console
+namespace Penguin.PgConsole
 {
     /// <summary>
     /// Static class for managing console stuff
@@ -14,13 +14,23 @@ namespace Penguin.Console
         /// Starts a process with the given startinfo
         /// </summary>
         /// <param name="startInfo">the startinfo of the process</param>
+        /// <param name="timeout"></param>
+        /// <param name="std"></param>
         /// <returns>the result of the run</returns>
-        public static ProcessResult Run(ProcessStartInfo startInfo, int timeout = int.MaxValue, Action<string> std = null)
+        public static ProcessResult Run(ProcessStartInfo startInfo, int timeout = 15000, Action<string> std = null)
         {
+            if (startInfo is null)
+            {
+                throw new ArgumentNullException(nameof(startInfo));
+            }
+
             StringBuilder output = new StringBuilder();
             StringBuilder error = new StringBuilder();
             ProcessResult Result = new ProcessResult();
 
+            startInfo.RedirectStandardError = true;
+            startInfo.RedirectStandardOutput = true;
+            
             using (Process process = new Process())
             {
                 process.StartInfo = startInfo;
@@ -66,14 +76,12 @@ namespace Penguin.Console
                     }
                 });
 
-                Task WaitLong = new Task(() => process.WaitForExit());
-
-                
+                Task WaitLong = new Task(() => process.WaitForExit());               
 
                 Task TryFinish = new Task(() =>
                 {
                     WaitLong.Start();
-                    Task Timeout = Task.Delay(15000);
+                    Task Timeout = Task.Delay(timeout);
 
                     Task.WaitAny(WaitLong, Timeout);
                 });
@@ -100,13 +108,21 @@ namespace Penguin.Console
             return Result;
         }
 
+        /// <summary>
         /// Runs an exe at the given path with the given args and returns the FINAL result to a string
         /// </summary>
         /// <param name="path">The path of the application to run</param>
         /// <param name="args">The application arguments</param>
-        /// <returns>The full STD out as a string</returns>
+        /// <returns></returns>
         public static ProcessResult Run(string path, params string[] args) => Run(GetStandardStartInfo(path, args));
 
+        /// <summary>
+        /// Runs an exe at the given path with the given args and returns the FINAL result to a string
+        /// </summary>
+        /// <param name="path">The path of the application to run</param>
+        /// <param name="args">The application arguments</param>
+        /// <param name="Std">Delegate to invoke when a new line is returned/param>
+        /// <returns></returns>
         public static ProcessResult Run(string path, Action<string> Std, params string[] args) => Run(GetStandardStartInfo(path, args), int.MaxValue, Std);
 
         /// <summary>
